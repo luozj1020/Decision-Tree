@@ -1,7 +1,6 @@
 import math
-# from print_tree import format_result, printf_tree
-from test_tree import create_data, test
 import json
+from test_tree import create_data, test
 
 def majority_value(vals):
     count_num = []
@@ -116,16 +115,27 @@ def create_decision_tree(data, attributes, target_attr, fitness_func, call_count
     if not data or (len(attributes) - 1) <= 0:
         print('属性集为空 或者 属性数量小于等于1')
         if data == []:
-            default = '0'
+            dir = {}
+            for i in range(3):
+                dir[str(i+1)] = {'r': '0'}
+            default = dir
         else:
-            default = majority_value(vals)
-        print({nex: default})
+            dir = {majority_value(vals): {'r': '1'}}
+            for i in range(3):
+                if int(majority_value(vals)) != i + 1:
+                    dir[str(i + 1)] = {'r': '0'}
+            default = {nex: dir}
+        print('default:', {nex: default})
         return {nex: default} # 返回样本数最多的类
     # 如果样本全属于同一类
     elif vals.count(vals[0]) == len(vals):
         print('样本全属于同一类')
-        print({nex: vals[0]})
-        return {nex: vals[0]}
+        dir = {vals[0]: {'r': '1'}}
+        for i in range(3):
+            if int(vals[0]) != i+1:
+                dir[str(i+1)] = {'r': '0'}
+        print({nex: dir})
+        return {nex: dir}
     else:
         # Choose the next best attribute to best classify our data
         best = choose_attribute(data, attributes, target_attr, fitness_func)
@@ -162,20 +172,10 @@ if __name__ == '__main__':
     print(json_tree)
     with open('tree.json', 'w') as f:
         f.write(json_tree)
-    '''
-    count = 0
-    result = {}
-    list_last = {}
-    result, list_last = format_result(tree, count, result, list_last)
-    print('\nformated_result:\n', result)
-    # print(list_last)
-    print('formated_tree:')
-    printf_tree(result)
-    '''
     test_data = create_data()
     result = {}
+    print('\ntest_data:\n', test_data)
     for i in range(len(test_data)):
         r = test(tree, test_data[i])
         result[i+1] = r
-    print('\ntest_data:\n', test_data)
     print('test_result:\n', result)
